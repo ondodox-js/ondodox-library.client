@@ -77,12 +77,15 @@ export default {
       await this.$axios
         .post("/users/daftar", data)
         .then((resp) => {
-          alert("Pendaftaran berhasil");
-          this.$router.push({ name: "auth", params: { user: resp.data.data } });
+          const result = resp.data;
+          alert(result.pesan);
+          this.$router.push({ name: "auth", params: { user: result.data } });
         })
         .catch((err) => {
-          alert("pendaftaran gagal!");
+          const error = err.response.data;
+          alert(error.pesan);
           form.el.reset();
+          form.el.nDepan.focus();
           this.$router.push({ name: "auth-buat-akun" });
         });
     },
