@@ -6,7 +6,9 @@
       <span class="font-bold text-2xl mb-8">Ondodox</span>
     </div>
     <div class="flex flex-col text-center w-full">
-      <span class="text-lg mb-2">Daftar akun</span>
+      <span class="text-lg mb-2"
+        >Daftar akun - <span class="font-bold">Kontributor</span></span
+      >
       <span class="mb-6">Gunakan email yang belum terdaftar</span>
       <form
         @submit.prevent="handleSubmit()"
@@ -36,7 +38,7 @@
         <div class="flex justify-between mt-4 md:mt-6">
           <form-anchor
             text="Kembali"
-            :to="{ name: 'auth' }"
+            :to="{ name: 'kontributor-auth-masuk' }"
             class="hover:bg-slate-300"
           />
           <form-button
@@ -51,11 +53,12 @@
   </div>
 </template>
 <script>
-import FormAnchor from "../../components/buttons/form-anchor.vue";
-import FormButton from "../../components/buttons/form-button.vue";
-import formInput from "../../components/inputs/form-input.vue";
+import FormAnchor from "../../../components/buttons/form-anchor.vue";
+import FormButton from "../../../components/buttons/form-button.vue";
+import FormInput from "../../../components/inputs/form-input.vue";
+import Swal from "sweetalert2";
 export default {
-  components: { formInput, FormButton, FormAnchor },
+  components: { FormInput, FormButton, FormAnchor },
   data() {
     return {};
   },
@@ -67,26 +70,45 @@ export default {
       };
 
       form.el.submit.setAttribute("disabled", "on");
+      const namaDepan = form.data.get("nDepan");
+      const namaBelakang = form.data.get("nBelakang");
+      const namaLengkap = namaDepan.concat(" ", namaBelakang);
+      const email = form.data.get("email");
+      const kataSandi = form.data.get("kataSandi");
 
       const data = {
-        namaDepan: form.data.get("nDepan"),
-        namaBelakang: form.data.get("nBelakang"),
-        email: form.data.get("email"),
-        kataSandi: form.data.get("kataSandi"),
+        namaLengkap,
+        email,
+        kataSandi,
       };
       await this.$axios
-        .post("/users/daftar", data)
+        .post("/kontributor", data)
         .then((resp) => {
           const result = resp.data;
-          alert(result.pesan);
-          this.$router.push({ name: "auth", params: { user: result.data } });
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Akun berhasil terdaftar!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          this.$router.push({
+            name: "kontributor-auth-masuk",
+            params: { user: result.data },
+          });
         })
         .catch((err) => {
-          const error = err.response.data;
-          alert(error.pesan);
+          console.log(err.response);
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Akun tidak terdaftar!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
           form.el.reset();
           form.el.nDepan.focus();
-          this.$router.push({ name: "auth-buat-akun" });
+          form.el.submit.removeAttribute("disabled");
         });
     },
   },

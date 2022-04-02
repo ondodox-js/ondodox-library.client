@@ -3,7 +3,7 @@
 <script>
 export default {
   mounted() {
-    this.$router.push({ name: "auth" });
+    this.$router.push({ name: "pengguna-auth-masuk" });
   },
 };
 </script>

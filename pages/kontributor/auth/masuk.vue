@@ -6,7 +6,9 @@
       <span class="font-bold text-2xl mb-8">Ondodox</span>
     </div>
     <div class="flex flex-col text-center w-full">
-      <span class="text-lg mb-2">Login</span>
+      <span class="text-lg mb-2"
+        >Login - <span class="font-bold">Kontributor</span></span
+      >
       <span class="mb-6">Gunakan akun yang sudah terdaftar</span>
       <form
         @submit.prevent="handleSubmit()"
@@ -19,10 +21,15 @@
           placeholder="Kata sandi ..."
           type="password"
         />
+        <form-anchor
+          text="Masuk sebagai pengguna"
+          :to="{ name: 'pengguna-auth-masuk' }"
+          class="hover:opacity-100 opacity-50"
+        />
         <div class="flex justify-between mt-12">
           <form-anchor
             text="Buat akun"
-            :to="{ name: 'auth-buat-akun' }"
+            :to="{ name: 'kontributor-auth-buat-akun' }"
             class="hover:bg-slate-300"
           />
           <form-button
@@ -37,12 +44,12 @@
   </div>
 </template>
 <script>
-import FormAnchor from "../../components/buttons/form-anchor.vue";
-import FormButton from "../../components/buttons/form-button.vue";
-import formInput from "../../components/inputs/form-input.vue";
+import FormAnchor from "../../../components/buttons/form-anchor.vue";
+import FormButton from "../../../components/buttons/form-button.vue";
+import FormInput from "../../../components/inputs/form-input.vue";
 
 export default {
-  components: { formInput, FormButton, FormAnchor },
+  components: { FormInput, FormButton, FormAnchor },
   methods: {
     async handleSubmit() {
       const form = {
@@ -55,22 +62,18 @@ export default {
         kataSandi: form.data.get("kataSandi"),
       };
       await this.$axios
-        .post("/users/masuk", data)
-        .then((result) => {
-          const resultData = result.data;
-          alert(resultData.pesan);
-          this.$store.state.user = resultData.data;
-          console.log(this.$store.state.user);
-          this.$router.push("/home");
+        .post("/kontributor/masuk", data)
+        .then((resp) => {
+          const result = resp.data;
+          console.log(result);
         })
         .catch((err) => {
-          const errorData = err.response.data;
+          const error = err.response;
+          form.el.reset();
+          form.el.email.focus();
+          form.el.submit.removeAttribute("disabled");
           alert(errorData.pesan);
         });
-
-      form.el.reset();
-      form.el.email.focus();
-      form.el.submit.removeAttribute("disabled");
     },
   },
   mounted() {
