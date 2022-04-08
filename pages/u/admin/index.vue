@@ -7,31 +7,24 @@
     </div>
     <div class="flex flex-col text-center w-full">
       <span class="text-lg mb-2"
-        >Login - <span class="font-bold">Kontributor</span></span
+        >Login - <span class="font-bold">Admin</span></span
       >
-      <span class="mb-6">Gunakan akun yang sudah terdaftar</span>
       <form
         @submit.prevent="handleSubmit()"
         id="form-login"
         class="flex flex-col"
       >
-        <form-input name="email" placeholder="Email..." type="email" />
+        <form-input
+          name="namaPengguna"
+          placeholder="Nama pengguna..."
+          type="text"
+        />
         <form-input
           name="kataSandi"
           placeholder="Kata sandi ..."
           type="password"
         />
-        <form-anchor
-          text="Masuk sebagai pengguna"
-          :to="{ name: 'pengguna-auth-masuk' }"
-          class="hover:opacity-100 opacity-50"
-        />
-        <div class="flex justify-between mt-12">
-          <form-anchor
-            text="Buat akun"
-            :to="{ name: 'kontributor-auth-buat-akun' }"
-            class="hover:bg-slate-300"
-          />
+        <div class="flex justify-end mt-12">
           <form-button
             class="bg-sky-600 hover:bg-sky-700 text-white"
             text="Berikutnya"
@@ -47,37 +40,66 @@
 import FormAnchor from "../../../components/buttons/form-anchor.vue";
 import FormButton from "../../../components/buttons/form-button.vue";
 import FormInput from "../../../components/inputs/form-input.vue";
+import Swal from "sweetalert2";
 
 export default {
   components: { FormInput, FormButton, FormAnchor },
+  middleware: "auth",
   methods: {
     async handleSubmit() {
+      Swal.fire({
+        title: "Silahkan tunggu sesaat...",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const form = {
         el: document.querySelector("#form-login"),
         data: new FormData(document.querySelector("#form-login")),
       };
+
       form.el.submit.setAttribute("disabled", "on");
+
       const data = {
         email: form.data.get("email"),
         kataSandi: form.data.get("kataSandi"),
       };
+
       await this.$axios
-        .post("/kontributor/masuk", data)
+        .post("/kontributor/login", data)
         .then((resp) => {
           const result = resp.data;
-          console.log(result);
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Upaya untuk login berhasil!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          //store -> user loginr
+          this.$store.state.user = result;
+          this.$router.push({ name: "kontributor" });
         })
         .catch((err) => {
           const error = err.response;
-          form.el.reset();
-          form.el.email.focus();
-          form.el.submit.removeAttribute("disabled");
-          alert(errorData.pesan);
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Upaya untuk login gagal!",
+            showConfirmButton: false,
+            timer: 1500,
+            didDestroy: () => {
+              form.el.email.focus();
+              form.el.submit.removeAttribute("disabled");
+            },
+          });
         });
     },
   },
   mounted() {
-    this.$store.commit("reset");
     const form = {
       el: document.querySelector("#form-login"),
       data: new FormData(document.querySelector("#form-login")),

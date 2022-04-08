@@ -44,7 +44,7 @@ export default {
     },
   },
   router: {
-    linkActiveClass: "ini-link",
-    linkExactActiveClass: "ini-link-active",
+    linkActiveClass: "active",
+    linkExactActiveClass: "this-active",
   },
 };

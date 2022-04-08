@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex flex-col w-full max-w-screen-lg md:p-8 p-4 my-6 mx-auto items-center md:shadow rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-500"
+    class="relative flex flex-col w-full max-w-screen-lg md:p-8 p-4 my-6 mx-auto items-center md:shadow rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500"
   >
     <div class="grid grid-cols-2 w-full">
       <div class=""></div>
@@ -9,29 +9,37 @@
           class="flex flex-col text-center w-full bg-white md:p-8 p-4 rounded-lg"
         >
           <span class="font-bold text-2xl mb-8">Ondodox</span>
-          <span class="text-lg mb-2">Login</span>
-          <span class="mb-6">Gunakan akun yang sudah terdaftar</span>
+          <span class="text-lg mb-2">Daftar akun</span>
+          <span class="mb-6">Gunakan email yang belum terdaftar</span>
           <form
             @submit.prevent="handleSubmit()"
             id="form-login"
-            class="flex flex-col md:shadow p-4"
+            class="flex flex-col md:shadow p-4 rounded-lg"
           >
+            <div class="grid grid-cols-2 md:gap-x-4 gap-x-2">
+              <form-input
+                class=""
+                placeholder="Nama depan..."
+                type="text"
+                name="nDepan"
+              />
+              <form-input
+                class=""
+                placeholder="Nama belakang..."
+                type="text"
+                name="nBelakang"
+              />
+            </div>
             <form-input name="email" placeholder="Email..." type="email" />
             <form-input
               name="kataSandi"
               placeholder="Kata sandi ..."
               type="password"
             />
-
-            <form-anchor
-              text="Masuk sebagai kontributor"
-              :to="{ name: 'kontributor-auth-masuk' }"
-              class="hover:bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:text-white"
-            />
             <div class="flex justify-between mt-12">
               <form-anchor
-                text="Daftar akun"
-                :to="{ name: 'pengguna-auth-buat-akun' }"
+                text="Kembali"
+                :to="{ name: 'u-pengguna-masuk' }"
                 class="hover:bg-slate-300"
               />
               <form-button
@@ -54,6 +62,7 @@ import FormButton from "../../../components/buttons/form-button.vue";
 import FormInput from "../../../components/inputs/form-input.vue";
 export default {
   components: { FormInput, FormAnchor, FormButton },
+  middleware: "auth",
   methods: {
     handleSubmit() {
       console.log("ok");

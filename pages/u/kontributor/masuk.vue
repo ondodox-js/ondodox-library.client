@@ -7,38 +7,29 @@
     </div>
     <div class="flex flex-col text-center w-full">
       <span class="text-lg mb-2"
-        >Daftar akun - <span class="font-bold">Kontributor</span></span
+        >Login - <span class="font-bold">Kontributor</span></span
       >
-      <span class="mb-6">Gunakan email yang belum terdaftar</span>
+      <span class="mb-6">Gunakan akun yang sudah terdaftar</span>
       <form
         @submit.prevent="handleSubmit()"
-        id="form-daftar"
+        id="form-login"
         class="flex flex-col"
       >
-        <div class="grid grid-cols-2 md:gap-x-4 gap-x-2">
-          <form-input
-            class=""
-            placeholder="Nama depan..."
-            type="text"
-            name="nDepan"
-          />
-          <form-input
-            class=""
-            placeholder="Nama belakang..."
-            type="text"
-            name="nBelakang"
-          />
-        </div>
-        <form-input placeholder="Email..." type="email" name="email" />
+        <form-input name="email" placeholder="Email..." type="email" />
         <form-input
+          name="kataSandi"
           placeholder="Kata sandi ..."
           type="password"
-          name="kataSandi"
         />
-        <div class="flex justify-between mt-4 md:mt-6">
+        <form-anchor
+          text="Masuk sebagai pengguna"
+          :to="{ name: 'u-pengguna-masuk' }"
+          class="hover:opacity-100 opacity-50"
+        />
+        <div class="flex justify-between mt-12">
           <form-anchor
-            text="Kembali"
-            :to="{ name: 'kontributor-auth-masuk' }"
+            text="Buat akun"
+            :to="{ name: 'u-kontributor-buat-akun' }"
             class="hover:bg-slate-300"
           />
           <form-button
@@ -57,60 +48,73 @@ import FormAnchor from "../../../components/buttons/form-anchor.vue";
 import FormButton from "../../../components/buttons/form-button.vue";
 import FormInput from "../../../components/inputs/form-input.vue";
 import Swal from "sweetalert2";
+
 export default {
   components: { FormInput, FormButton, FormAnchor },
-  data() {
-    return {};
-  },
+  middleware: "auth",
   methods: {
     async handleSubmit() {
+      Swal.fire({
+        title: "Silahkan tunggu sesaat...",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const form = {
-        el: document.querySelector("#form-daftar"),
-        data: new FormData(document.querySelector("#form-daftar")),
+        el: document.querySelector("#form-login"),
+        data: new FormData(document.querySelector("#form-login")),
       };
 
       form.el.submit.setAttribute("disabled", "on");
-      const namaDepan = form.data.get("nDepan");
-      const namaBelakang = form.data.get("nBelakang");
-      const namaLengkap = namaDepan.concat(" ", namaBelakang);
-      const email = form.data.get("email");
-      const kataSandi = form.data.get("kataSandi");
 
       const data = {
-        namaLengkap,
-        email,
-        kataSandi,
+        email: form.data.get("email"),
+        kataSandi: form.data.get("kataSandi"),
       };
+
       await this.$axios
-        .post("/kontributor", data)
+        .post("/kontributor/login", data)
         .then((resp) => {
           const result = resp.data;
           Swal.fire({
             position: "center",
             icon: "success",
-            title: "Akun berhasil terdaftar!",
+            title: "Upaya untuk login berhasil!",
             showConfirmButton: false,
             timer: 1500,
           });
-          this.$router.push({
-            name: "kontributor-auth-masuk",
-            params: { user: result.data },
-          });
+          //store -> user loginr
+          this.$store.state.user = result;
+          this.$router.push({ name: "kontributor" });
         })
         .catch((err) => {
-          console.log(err.response);
+          const error = err.response;
           Swal.fire({
             position: "center",
             icon: "error",
-            title: "Akun tidak terdaftar!",
+            title: "Upaya untuk login gagal!",
             showConfirmButton: false,
             timer: 1500,
+            didDestroy: () => {
+              form.el.email.focus();
+              form.el.submit.removeAttribute("disabled");
+            },
           });
-          form.el.reset();
-          form.el.nDepan.focus();
-          form.el.submit.removeAttribute("disabled");
         });
     },
+  },
+  mounted() {
+    const form = {
+      el: document.querySelector("#form-login"),
+      data: new FormData(document.querySelector("#form-login")),
+    };
+    const user = this.$route.params.user;
+    if (user != undefined) {
+      form.el.email.value = user.email;
+    }
   },
 };
 </script>
