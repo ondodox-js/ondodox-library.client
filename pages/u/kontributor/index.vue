@@ -23,7 +23,7 @@
         />
         <form-anchor
           text="Masuk sebagai pengguna"
-          :to="{ name: 'u-pengguna-masuk' }"
+          :to="{ name: 'u-pengguna' }"
           class="hover:opacity-100 opacity-50"
         />
         <div class="flex justify-between mt-12">

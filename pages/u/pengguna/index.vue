@@ -25,7 +25,7 @@
 
             <form-anchor
               text="Masuk sebagai kontributor"
-              :to="{ name: 'u-kontributor-masuk' }"
+              :to="{ name: 'u-kontributor' }"
               class="hover:bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:text-white"
             />
             <div class="flex justify-between mt-12">
@@ -52,13 +52,74 @@
 import FormAnchor from "../../../components/buttons/form-anchor.vue";
 import FormButton from "../../../components/buttons/form-button.vue";
 import FormInput from "../../../components/inputs/form-input.vue";
+import Swal from "sweetalert2";
 export default {
   components: { FormInput, FormAnchor, FormButton },
   middleware: "auth",
   methods: {
-    handleSubmit() {
-      console.log("ok");
+    async handleSubmit() {
+      Swal.fire({
+        title: "Silahkan tunggu sesaat...",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const form = {
+        el: document.querySelector("#form-login"),
+        data: new FormData(document.querySelector("#form-login")),
+      };
+
+      form.el.submit.setAttribute("disabled", "on");
+
+      const data = {
+        email: form.data.get("email"),
+        kataSandi: form.data.get("kataSandi"),
+      };
+
+      await this.$axios
+        .post("/pengguna/login", data)
+        .then((resp) => {
+          const result = resp.data;
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Upaya untuk login berhasil!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          //store -> user loginr
+          this.$store.state.user = result;
+          this.$router.push({ name: "pengguna" });
+        })
+        .catch((err) => {
+          const error = err.response;
+          console.log(error);
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Upaya untuk login gagal!",
+            showConfirmButton: false,
+            timer: 1500,
+            didDestroy: () => {
+              form.el.email.focus();
+              form.el.submit.removeAttribute("disabled");
+            },
+          });
+        });
     },
+  },
+  mounted() {
+    const form = {
+      el: document.querySelector("#form-login"),
+      data: new FormData(document.querySelector("#form-login")),
+    };
+    const user = this.$route.params.user;
+    if (user != undefined) {
+      form.el.email.value = user.email;
+    }
   },
 };
 </script>

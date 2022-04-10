@@ -13,7 +13,7 @@
           <span class="mb-6">Gunakan email yang belum terdaftar</span>
           <form
             @submit.prevent="handleSubmit()"
-            id="form-login"
+            id="form-daftar"
             class="flex flex-col md:shadow p-4 rounded-lg"
           >
             <div class="grid grid-cols-2 md:gap-x-4 gap-x-2">
@@ -39,7 +39,7 @@
             <div class="flex justify-between mt-12">
               <form-anchor
                 text="Kembali"
-                :to="{ name: 'u-pengguna-masuk' }"
+                :to="{ name: 'u-pengguna' }"
                 class="hover:bg-slate-300"
               />
               <form-button
@@ -60,12 +60,58 @@
 import FormAnchor from "../../../components/buttons/form-anchor.vue";
 import FormButton from "../../../components/buttons/form-button.vue";
 import FormInput from "../../../components/inputs/form-input.vue";
+
+import Swal from "sweetalert2";
 export default {
   components: { FormInput, FormAnchor, FormButton },
   middleware: "auth",
   methods: {
-    handleSubmit() {
-      console.log("ok");
+    async handleSubmit() {
+      const form = {
+        el: document.querySelector("#form-daftar"),
+        data: new FormData(document.querySelector("#form-daftar")),
+      };
+
+      form.el.submit.setAttribute("disabled", "on");
+      const namaDepan = form.data.get("nDepan");
+      const namaBelakang = form.data.get("nBelakang");
+      const namaLengkap = namaDepan.concat(" ", namaBelakang);
+      const email = form.data.get("email");
+      const kataSandi = form.data.get("kataSandi");
+
+      const data = {
+        namaLengkap,
+        email,
+        kataSandi,
+      };
+      await this.$axios
+        .post("/pengguna", data)
+        .then((resp) => {
+          const result = resp.data;
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Akun berhasil terdaftar!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          this.$router.push({
+            name: "u-pengguna",
+            params: { user: result.data },
+          });
+        })
+        .catch((err) => {
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Akun gagal terdaftar!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          form.el.reset();
+          form.el.nDepan.focus();
+          form.el.submit.removeAttribute("disabled");
+        });
     },
   },
 };

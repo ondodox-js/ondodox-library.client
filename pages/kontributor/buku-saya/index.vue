@@ -25,7 +25,7 @@
     <form-anchor
       text="Buku baru"
       :to="{ name: 'kontributor-buku-saya-tambah-buku' }"
-      class="hover:text-green-600"
+      class="hover:text-green-600 font-bold"
     />
   </div>
 </template>

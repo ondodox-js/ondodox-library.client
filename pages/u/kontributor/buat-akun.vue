@@ -38,7 +38,7 @@
         <div class="flex justify-between mt-4 md:mt-6">
           <form-anchor
             text="Kembali"
-            :to="{ name: 'u-kontributor-masuk' }"
+            :to="{ name: 'u-kontributor' }"
             class="hover:bg-slate-300"
           />
           <form-button
@@ -94,7 +94,7 @@ export default {
             timer: 1500,
           });
           this.$router.push({
-            name: "u-kontributor-masuk",
+            name: "u-kontributor",
             params: { user: result.data },
           });
         })

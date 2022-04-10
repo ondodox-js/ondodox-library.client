@@ -11,11 +11,15 @@ export const actions = {
   },
   keluarKontributor({ commit }) {
     commit("resetState");
-    $nuxt.$router.push({ name: "u-kontributor-masuk" });
+    $nuxt.$router.push({ name: "u-kontributor" });
   },
   keluarAdmin({ commit }) {
     commit("resetState");
     $nuxt.$router.push({ name: "u-admin" });
+  },
+  keluarPengguna({ commit }) {
+    commit("resetState");
+    $nuxt.$router.push({ name: "u-pengguna" });
   },
   pushBuku({ commit }, buku) {
     commit("pushBuku", buku);

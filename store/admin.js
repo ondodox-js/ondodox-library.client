@@ -15,11 +15,24 @@ export const getters = {
   getTransaksi(state) {
     return state.kumpulanTransaksi;
   },
+  getBuku(state) {
+    return state.kumpulanBuku;
+  },
 };
 
 export const actions = {
   getKodeTransaksi(ex, id) {
     return "TRS" + id.toString().padStart(4, "0");
+  },
+  tanggalTransaksi(ex, date) {
+    const date1 = new Date(date);
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return date1.toLocaleDateString("id-ID", options);
   },
 };
 

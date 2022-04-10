@@ -1,5 +1,10 @@
 <template>
-  <nuxt-link :to="{ name: 'admin-permintaan-buku', params: { buku: buku.id } }">
+  <nuxt-link
+    :to="{
+      name: 'admin-permintaan-buku',
+      params: { buku: buku.id, data: buku },
+    }"
+  >
     <div
       class="relative flex justify-between h-full px-2 pt-4 pb-2 shadow hover:shadow-2xl cursor-pointer rounded-lg"
     >
@@ -7,7 +12,9 @@
       <div class="p-2 leading-none min-w-0 flex flex-col flex-1 h-full">
         <div class="font-bold truncate">{{ buku.judul }}</div>
         <span class="opacity-80 text-xs">{{ buku.pengarang }}</span>
-        <div class="text-xs mb-2">{{ buku.kontributor.email }}</div>
+        <div class="text-xs mb-2">
+          {{ buku.kontributor.email }}
+        </div>
         <span class="opacity-80 text-xs">sinopsis :</span>
         <p class="opacity-80 flex-1 text-xs">
           {{ sinopsis }}
@@ -33,7 +40,6 @@ export default {
   computed: {
     image() {
       return "http://localhost:8083/images/covers/" + this.buku.gambar;
-      //   return "http://localhost:8083/images/covers/" + buku.gambar;
     },
     sinopsis() {
       return this.buku.sinopsis.substring(0, 200) + " ...";
